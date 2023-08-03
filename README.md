@@ -39,6 +39,21 @@ You will also need to pass a function that takes in a string and sends it to the
 Pass this function in the keyword argument text_gen_func
 This keeps things simple and allows you to write any kind of function you'd like to interact with your LLM
 """
+import openai 
+
+openai.organisation = 'ORG-ID'
+openai.api_key = 'API_KEY'
+
+def generate_func(prompt, return_explanation = False):
+    response = openai.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages=[
+            {"role": "system", "content": prompt}
+        ]
+    )
+    resp_text = response['choices'][0]['message']['content']
+    return resp_text
+
 prompt = "Remove vowels"
 
 #List of ip/op pairs with labels context and output
