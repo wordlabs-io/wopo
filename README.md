@@ -31,7 +31,8 @@ For prompt optimisation, we basically need three things:
 2. A set of context vs output (i.e. if operation prompt was performed on context, what would be the correct output>)
 3. A selection strategy (to decide how to choose the right prompt
 
-You will also need to pass a function that takes in a string and sends it to the LLM and returns the string. Pass this function in the keyword argument text_gen_func
+You will also need to pass a function that takes in a string and sends it to the LLM and returns the string.
+Pass this function in the keyword argument text_gen_func
 This keeps things simple and allows you to write any kind of function you'd like to interact with your LLM
 """
 prompt = "Remove vowels"
