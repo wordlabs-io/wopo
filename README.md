@@ -72,7 +72,8 @@ If you only have one ip/op pair, use ```WOPO.run_single_chain_optimisation()``` 
 ### Available selection strategies
 Currently, we have only added brute force mechanisms. Our first goal is to see how well this performs. However, in the coming weeks, you can expect to see the following:
 
-1. Unchained Bandit Selection
-2. Tree Pruning
-3. Stepwise merging
+1. Upper Confidence Bound Bandit Selection
+2. Successive Rejects
+3. Tree Pruning
+4. Stepwise merging
 
