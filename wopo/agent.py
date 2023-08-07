@@ -7,14 +7,12 @@ class Agent:
         self.original_prompt = prompt 
         self.data = data 
         self.correct_output = correct_output
-        self.prompt_funcs = Prompts()
+        self.prompt_funcs = Prompts(text_gen)
         self.last_output = None
         self.last_feedback = None
         self.step = 0
         self.state = []
-        self.text_gen = text_gen
 
-    
     def update_state(self, prompt: str = None, output: str = None, feedback: str = None, score: int = None):
         self.prompt = prompt
         self.last_output = output
@@ -33,14 +31,9 @@ class Agent:
         self.step += 1
  
     def generate_prompt_and_output(self, prompt):
-        receive_prompt = self.text_gen(prompt)
-
-        clean_prompt = self.prompt_funcs.clean_prompt(receive_prompt)
-        clean_prompt = self.text_gen(clean_prompt)    
-        
+        clean_prompt = self.prompt_funcs.clean_prompt(prompt)
         receive_output = self.prompt_funcs.execute_prompt(clean_prompt, self.data)
-        receive_output = self.text_gen(receive_output)
-
+        
         return clean_prompt, receive_output
 
 
@@ -67,8 +60,7 @@ class Agent:
     
     def check_correctness(self, output):
         correctness_prompt = self.prompt_funcs.correctness_prompt(self.correct_output, output)
-        response = self.text_gen(correctness_prompt)
-        dictified = json.loads(response)
+        dictified = json.loads(correctness_prompt)
         return dictified
 
     def log_last_step(self):

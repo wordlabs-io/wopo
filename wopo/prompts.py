@@ -1,4 +1,10 @@
+import copy
+
 class Prompts:
+
+    def __init__(self, generation_function = None):
+        #assert generation_function is not None, "Text generation not provided, initialisation failed"
+        self.generation_function = copy.deepcopy(generation_function)
 
     def initial_prompt(self, prompt: str, data: str = None):
         prompt = f"""
@@ -18,7 +24,7 @@ class Prompts:
         received_output: {received_output}
         feedback: {feedback}
         """
-        return prompt
+        return self.generation_function(prompt)
     
     def execute_prompt(self, prompt:str, data: str):
         prompt = f"""
@@ -26,7 +32,7 @@ class Prompts:
 
         {data}
         """
-        return prompt
+        return self.generation_function(prompt)
 
     def clean_prompt(self, prompt: str):
         prompt = f"""
@@ -35,7 +41,7 @@ class Prompts:
         prompt: {prompt}
         """
 
-        return prompt
+        return self.generation_function(prompt)
 
     def correctness_prompt(self, expected_output: str, received_output: str):
         prompt = f"""
@@ -45,7 +51,7 @@ class Prompts:
 
         received_output: {received_output}
         """
-        return prompt
+        return self.generation_function(prompt)
 
     def consolidation_prompt(self, prompts_list):
         prompts = "\n\n".join(prompts_list)
@@ -56,4 +62,7 @@ class Prompts:
         {prompts}
         """
 
-        return prompt
+        return self.generation_function(prompt)
+
+    def execute(self, prompt):
+        return self.generation_function(prompt)

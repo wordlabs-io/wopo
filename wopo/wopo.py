@@ -1,22 +1,26 @@
 import os
 import json
 from prefect import task, flow 
+from tqdm import tqdm  
+import copy
+
 from wopo.prompts import Prompts
 from wopo.agent import Agent 
-import pandas as pd
-from tqdm import tqdm  
+from wopo.consolidator import Consolidator
+from wopo.minifier import EntropyMinifier
 
 class WOPO:
-    def __init__(self, prompt, data, text_gen_func = None, process_verbose: bool = False):
+    def __init__(self, prompt, data, text_gen_func = None, strategy: str = "max", process_verbose: bool = False):
         self.agents = [Agent(prompt, datapoint["context"], datapoint["output"], text_gen_func) for datapoint in data]
-        self.prompter = Prompts()
+        self.prompter = Prompts(text_gen_func)
         
         assert text_gen_func is not None, "Text Generation Function not provided"
-        self.text_gen = text_gen_func
+        self.text_gen = copy.deepcopy(text_gen_func)
 
         self.optimal_prompt = None 
+        self.consolidator = Consolidator(strategy = strategy)
 
-    def run_optimisation(self, mode: str = "brute_force", num_iters: int = 1, num_steps_per_iter: int = 1, top_k: int = 1, retries_on_failure: int = 3, retry_delay_seconds: int = 15): 
+    def run_optimisation(self, num_iters: int = 1, num_steps_per_iter: int = 1, top_k: int = 1, random_sample_size: int = 1, cutoff_score: int = 100, retries_on_failure: int = 3, retry_delay_seconds: int = 15): 
 
         results = {}
         agent_states = {}
@@ -35,32 +39,8 @@ class WOPO:
 
         @flow(retries = retries_on_failure, retry_delay_seconds = retry_delay_seconds)
         def correctness():
-            temp = check_correctness_for_agent.map(self.agents)
-            return temp
-   
-        def consolidate_scores(agent_scores):
-            df = pd.DataFrame.from_dict(agent_scores)
-            avg_score = df["score"].mean()
-            min_score = df["score"].min()
-            max_score = df["score"].max()
-
-            results = {
-                "avg": avg_score,
-                "max": max_score,
-                "min": min_score
-            }
-
-            df = df.nlargest(top_k, "score")
-            df = df["prompt"]
-            prompt_list = df.tolist()
-            if len(prompt_list) > 1:
-                consolidate_prompt = self.prompter.consolidation_prompt(prompt_list)
-                consolidate_prompt = self.text_gen(consolidate_prompt)
-            else:
-                consolidate_prompt = prompt_list[0]
-
-            return consolidate_prompt, results
-
+            correctness_levels = check_correctness_for_agent.map(self.agents)
+            return correctness_levels
 
         for i in tqdm(range(num_iters)):
             
@@ -69,9 +49,13 @@ class WOPO:
         
             correctness_scores = correctness()
             correctness_scores = [a.result() for a in correctness_scores]
-            consolidated_prompt, step_results = consolidate_scores(correctness_scores)
+            consolidated_prompt, step_results = self.consolidator.consolidate(top_k, random_sample_size, correctness_scores)#consolidate_scores(correctness_scores)
             
             agent_states[i] = [agent.logs() for agent in self.agents]
+
+            if step_results['min'] >= cutoff_score:
+                print(f"Early stopping at step {i}, minimum score is {step_results['min']}")
+                break
 
             self.agents = [agent.flush(consolidated_prompt) for agent in self.agents]
             
@@ -91,7 +75,7 @@ class WOPO:
                 print(f"Early stopping at step {i}")
                 break
         self.optimal_prompt = agent.prompt 
-        return agent.prompt
+        return agent.prompt, agent.logs()
 
     def run_test(self, data, save_location: str = None):
         assert self.optimal_prompt is not None, "Optimal prompt not provided or found"
@@ -118,6 +102,8 @@ class WOPO:
 
         return df
 
+    def minify(self, minification_model: str = 'bert-base-uncased', percentile: int = 0.1):
+        minifier = EntropyMinifier(model_name = minification_model, p = probability)
 
-
+        return minifier.minify(self.optimal_prompt)
 
