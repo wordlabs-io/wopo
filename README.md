@@ -95,10 +95,31 @@ test = y.run_test(some_other_data, save_location = "test_result.csv")
 If you only have one ip/op pair, use ```WOPO.run_single_chain_optimisation()``` function. You may additionally specify the ```stop_at_score``` criteria (between 0-100) at which the chain can stop early
 
 ### Available selection strategies
-Currently, we have only added brute force mechanisms. Our first goal is to see how well this performs. However, in the coming weeks, you can expect to see the following:
+1. Max: Choose the prompt that gets closest to the answer ```WOPO(strategy = 'max')```
+2. Top K: Combine the prompts from the top k highest scoring prompts
+   ```python
+   WOPO(strategy = 'top_k')
+   WOPO.run_optimisation(top_k = top_k)
+   ```
+3. Random Selection from Top K: Given top k scoring prompts, select n random prompts from the top k prompts
+   ```python
+   WOPO(strategy = 'random_from_top_k')
+   WOPO.run_optimisation(top_k = top_k, random_sample_size = random_sample_size)
+   ```
+### Prompt Minification
+![](https://tenor.com/bbN6E.gif)
+Optimal prompts offer better accuracy in terms of output, but they tend to be verbose. Most LLMs are not cheap to operate, and it is best to use the fewest number of tokens possible in prompting. To reduce the number of tokens being used, we can simply find which words are most likely to be implicitly understood by the LLM even if they are removed.
+> For example, if I were to say 'The quick brown fox' you immediately think of 'jumps over the lazy dog', even though 'ate all my peanut butter' was also a valid sentence
+The process is called Entropy Minification.
 
-1. Upper Confidence Bound Bandit Selection
-2. Successive Rejects
-3. Tree Pruning
-4. Stepwise merging
+```python
+"""
+Specify the model name (default: bert-base-uncased) from HuggingFace Transformers library and provide a percentile score (default: 0.1).
+The tokens falling in the top percentile score of likelihood will be removed 
+"""
+optimal_prompt, _, _ = WOPO.run_optimisaton()
+minified_prompt = WOPO.minify(model_name = model_name, percentile = percentile)
+```
+
+
 
