@@ -1,9 +1,10 @@
 from setuptools import setup, find_packages
 import os
-
-VERSION = '0.0.1'
+from pathlib import Path
+VERSION = '0.0.2'
 DESCRIPTION = 'wordlabs open prompt optimiser: Automatic prompt optimisation'
-long_description = 'Non parametric plug and play prompt optimisation'
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text()
 
 # Setting up
 setup(
@@ -11,6 +12,8 @@ setup(
     version=VERSION,
     author="wordlabs.io",
     author_email="<tanishk.kithannae@wordlabs.io>",
+    url="https://github.com/wordlabs-io/wopo",
+    license='LICENSE.txt',
     description=DESCRIPTION,
     long_description_content_type="text/markdown",
     long_description=long_description,
@@ -18,7 +21,7 @@ setup(
     install_requires=['tqdm', 'pandas'],
     keywords=['python', 'nlp', 'prompt', 'optimisation'],
     classifiers=[
-        "Development Status :: 1 - Planning",
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3",
         "Operating System :: Unix",
