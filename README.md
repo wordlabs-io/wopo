@@ -16,7 +16,7 @@ Additionally, finding the best possible prompt that incorporates a lot of differ
 WOPO uses Prefect for orchestration, however, PyPi was unable to find the right versions for installation. 
 If not already installed, use the command below
 ```
-pip install prefect==2.11.2 torch==2.0.1 transformers==4.31.0
+pip install prefect==2.11.2
 ```
 Then install the WOPO library 
 ```
