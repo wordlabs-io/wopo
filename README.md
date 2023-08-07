@@ -107,7 +107,6 @@ If you only have one ip/op pair, use ```WOPO.run_single_chain_optimisation()``` 
    WOPO.run_optimisation(top_k = top_k, random_sample_size = random_sample_size)
    ```
 ### Prompt Minification
-![As quoted by Kevin Malone](https://tenor.com/bbN6E.gif)
 Optimal prompts offer better accuracy in terms of output, but they tend to be verbose. Most LLMs are not cheap to operate, and it is best to use the fewest number of tokens possible in prompting. To reduce the number of tokens being used, we can simply find which words are most likely to be implicitly understood by the LLM even if they are removed.
 > For example, if I were to say 'The quick brown fox' you immediately think of 'jumps over the lazy dog', even though 'ate all my peanut butter' was also a valid sentence
 The process is called Entropy Minification.
