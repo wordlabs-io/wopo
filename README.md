@@ -18,9 +18,13 @@ If not already installed, use the command below
 ```
 pip install prefect==2.11.2
 ```
+We will also need the PyTorch and Transformers libraries for minification. If not already installed, uuse the command below:
+```
+pip install torch transformers
+```
 Then install the WOPO library 
 ```
-pip install wopo==0.0.1
+pip install wopo==0.0.2
 ```
 > Please note that this library is still in alpha release, code for WOPO will be changing rapidly in the coming months.
 > If you face any issues, make sure to drop a message here!
