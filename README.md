@@ -24,14 +24,14 @@ pip install torch transformers
 ```
 Then install the WOPO library 
 ```
-pip install wopo==0.0.2
+pip install wopo
 ```
 > Please note that this library is still in alpha release, code for WOPO will be changing rapidly in the coming months.
 > If you face any issues, make sure to drop a message here!
 
  ### Usage
 ```python
-from wopo import WOPO
+from wopo.wopo import WOPO
 
 """
 For prompt optimisation, we basically need three things:
@@ -86,7 +86,7 @@ optimal_prompt
 results: scores of each step 
 agent_states: complete logs of how each step changed the prompt and related feedback
 """
-optimal_prompt, results, agent_states = y.run_optimisation(num_iters = 5, num_step_per_iter = 1, top_k = 2)
+optimal_prompt, results, agent_states = y.run_optimisation(num_iters = 5, num_steps_per_iter = 1, top_k = 2)
 
 """
 You can also run simple tests to analyse how well the new prompt is working
